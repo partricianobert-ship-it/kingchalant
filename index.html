@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>King 👑 Pro Mobile</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: black;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* SPLASH SCREEN */
+#splash {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, #111, #000);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  letter-spacing: 4px;
+  z-index: 999;
+  animation: fadeOut 2.5s forwards;
+}
+
+@keyframes fadeOut {
+  0% {opacity:1;}
+  80% {opacity:1;}
+  100% {opacity:0; visibility:hidden;}
+}
+
+/* HEART BACKGROUND */
+#hearts {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.heart {
+  position: absolute;
+  bottom: -20px;
+  animation: float 6s linear forwards;
+  opacity: 0.25;
+}
+
+@keyframes float {
+  to {transform: translateY(-120vh); opacity: 0;}
+}
+
+/* APP */
+#app {
+  display: none;
+  position: relative;
+  z-index: 2;
+}
+
+/* LOCK */
+#lock {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+input {
+  padding: 14px;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 12px;
+  border: none;
+}
+
+/* BUTTONS */
+.btn {
+  width: 85%;
+  padding: 16px;
+  margin: 10px;
+  font-size: 18px;
+  border-radius: 18px;
+  border: none;
+  background: linear-gradient(135deg,#00c6ff,#0072ff);
+  color: white;
+}
+
+/* HOME */
+#home {
+  display: none;
+  padding-top: 35px;
+}
+
+/* PAGE */
+.page {
+  display: none;
+  padding: 20px;
+  animation: fade 0.4s ease;
+}
+
+@keyframes fade {
+  from {opacity:0; transform: scale(0.98);}
+  to {opacity:1; transform: scale(1);}
+}
+
+img {
+  width: 92%;
+  border-radius: 18px;
+  margin-top: 10px;
+}
+
+.msg {
+  margin-top: 10px;
+  background: #111;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+/* TOP BAR */
+#topbar {
+  padding: 12px;
+  background: #111;
+  font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SPLASH -->
+<div id="splash">👑 KING PRO LOADING</div>
+
+<!-- HEARTS -->
+<div id="hearts"></div>
+
+<!-- LOCK -->
+<div id="lock">
+  <h2>🔐 Enter PIN</h2>
+  <input type="password" id="pin">
+  <br><br>
+  <button class="btn" onclick="unlock()">Unlock</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <div id="topbar">👑 King Pro Mobile App</div>
+
+  <div id="home">
+    <h2>Welcome King 👑</h2>
+
+    <button class="btn" onclick="openPage(0)">💙 Memories</button>
+    <button class="btn" onclick="openPage(1)">👑 Moments</button>
+    <button class="btn" onclick="openPage(2)">✨ Vibes</button>
+    <button class="btn" onclick="openPage(3)">🎁 Special</button>
+  </div>
+
+  <div class="page" id="p0">
+    <img id="img0">
+    <div class="msg" id="m0"></div>
+    <button class="btn" onclick="back()">Back</button>
+  </div>
+
+  <div class="page" id="p1">
+    <img id="img1">
+    <div class="msg" id="m1"></div>
+    <button class="btn" onclick="back()">Back</button>
+  </div>
+
+  <div class="page" id="p2">
+    <img id="img2">
+    <div class="msg" id="m2"></div>
+    <button class="btn" onclick="back()">Back</button>
+  </div>
+
+  <div class="page" id="p3">
+    <img id="img3">
+    <div class="msg" id="m3"></div>
+    <button class="btn" onclick="back()">Back</button>
+  </div>
+
+</div>
+
+<audio id="music" src="music.mp3.mp3" loop></audio>
+
+<script>
+
+// SERVICE WORKER
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js');
+}
+
+// SPLASH → LOCK
+setTimeout(()=>{
+  document.getElementById("splash").style.display="none";
+},2500);
+
+// HEART SYSTEM (LIGHTWEIGHT)
+setInterval(()=>{
+  let h=document.createElement("div");
+  h.className="heart";
+  h.innerHTML="💙";
+  h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=(Math.random()*18+10)+"px";
+  document.getElementById("hearts").appendChild(h);
+  setTimeout(()=>h.remove(),6000);
+},400);
+
+// UNLOCK (MOBILE SAFE AUDIO FIX)
+function unlock(){
+  if(document.getElementById("pin").value==="1234"){
+    document.getElementById("lock").style.display="none";
+    document.getElementById("app").style.display="block";
+    document.getElementById("home").style.display="block";
+
+    let music=document.getElementById("music");
+    music.volume=0.5;
+    music.play().catch(()=>{});
+
+    startSlides();
+  }else{
+    alert("Wrong PIN ❌");
+  }
+}
+
+// NAVIGATION
+function openPage(n){
+  document.getElementById("home").style.display="none";
+  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+  document.getElementById("p"+n).style.display="block";
+}
+
+function back(){
+  document.querySelectorAll(".page").forEach(p=>p.style.display="none");
+  document.getElementById("home").style.display="block";
+}
+
+// 20 IMAGE SYSTEM
+let imgs=[
+["photo1.jpg","photo2.jpg","photo3.jpg","photo4.jpg","photo5.jpg"],
+["photo6.jpg","photo7.jpg","photo8.jpg","photo9.jpg","photo10.jpg"],
+["photo11.jpg","photo12.jpg","photo13.jpg","photo14.jpg","photo15.jpg"],
+["photo16.jpg","photo17.jpg","photo18.jpg","photo19.jpg","photo20.jpg"]
+];
+
+let msgs=[
+["💙 Memory","💙 Memory","💙 Memory","💙 Memory","💙 Memory"],
+["👑 Moment","👑 Moment","👑 Moment","👑 Moment","👑 Moment"],
+["✨ Vibe","✨ Vibe","✨ Vibe","✨ Vibe","✨ Vibe"],
+["🎁 Special","🎁 Special","🎁 Special","🎁 Special","🎁 Special"]
+];
+
+function startSlides(){
+  imgs.forEach((set,i)=>{
+    let index=0;
+    document.getElementById("img"+i).src=set[0];
+    document.getElementById("m"+i).innerText=msgs[i][0];
+
+    setInterval(()=>{
+      index=(index+1)%set.length;
+      document.getElementById("img"+i).src=set[index];
+      document.getElementById("m"+i).innerText=msgs[i][index];
+    },2200);
+  });
+}
+
+</script>
+
+</body>
+</html>
